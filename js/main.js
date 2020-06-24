@@ -1,6 +1,8 @@
 'use strict';
 
 var PIN_AMOUNT = 8;
+var MIN_Y = 130;
+var MAX_Y = 630;
 var FEATURES = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
 var ROOM_TYPE = ['palace', 'flat', 'house', 'bungalo'];
 var BLOCK_SIZE = 1000;
@@ -19,7 +21,7 @@ var shuffle = function (array) {
 
   while (currentIndex !== 0) {
 
-    randomIndex = Math.floor(Math.random() * currentIndex);
+    randomIndex = randomInt(0, currentIndex - 1);
     currentIndex -= 1;
 
     temporaryValue = array[currentIndex];
@@ -30,7 +32,7 @@ var shuffle = function (array) {
   return array;
 };
 
-var generatePin = function () {
+var generatePins = function () {
   var pins = [];
   for (var i = 0; i < PIN_AMOUNT; i++) {
     var featuresArr = shuffle(FEATURES);
@@ -44,7 +46,7 @@ var generatePin = function () {
       photosArray[k] = 'http://o0.github.io/assets/images/tokyo/hotel' + k + 1 + '.jpg';
     }
     var locationX = randomInt(0, BLOCK_SIZE);
-    var locationY = randomInt(130, 630);
+    var locationY = randomInt(MIN_Y, MAX_Y);
     var pin = {
       author: {
         avatar: 'img/avatars/user0' + (i + 1) + '.png'
@@ -75,7 +77,7 @@ var generatePin = function () {
 map.classList.remove('map-faded');
 
 var renderPins = function () {
-  var pins = generatePin();
+  var pins = generatePins();
   var fragment = document.createDocumentFragment();
   for (var i = 0; i < pins.length; i++) {
     var pinElement = pinTemplate.cloneNode(true);
