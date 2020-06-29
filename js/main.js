@@ -1,94 +1,97 @@
 'use strict';
 
-var PIN_AMOUNT = 8;
-var MIN_Y = 130;
-var MAX_Y = 630;
-var FEATURES = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
-var ROOM_TYPE = ['palace', 'flat', 'house', 'bungalo'];
-var BLOCK_SIZE = 1000;
+var PIN_POINT_HEIGHT = 84;
+var PIN_POINT_WIDTH = 62;
+
 var map = document.querySelector('.map');
-var pinTemplate = document.querySelector('#pin')
-  .content
-  .querySelector('.map__pin');
-var pinsList = map.querySelector('.map__pins');
-var randomInt = function (min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-};
-var shuffle = function (array) {
-  var currentIndex = array.length;
-  var temporaryValue;
-  var randomIndex;
+var addForm = document.querySelector('.ad-form');
+var inputs = addForm.querySelectorAll('input');
+var selects = addForm.querySelectorAll('select');
+var mapFilters = document.querySelector('.map__filters');
+var mainPin = document.querySelector('.map__pin--main');
+var filterInputs = mapFilters.querySelectorAll('input');
+var filterSelects = mapFilters.querySelectorAll('select');
+var address = document.getElementById('address');
+var roomNumber = document.getElementById('room_number');
+var capacity = document.getElementById('capacity');
 
-  while (currentIndex !== 0) {
-
-    randomIndex = randomInt(0, currentIndex - 1);
-    currentIndex -= 1;
-
-    temporaryValue = array[currentIndex];
-    array[currentIndex] = array[randomIndex];
-    array[randomIndex] = temporaryValue;
+var disableElements = function (elements) {
+  for (var i = 0; i < elements.length; i++) {
+    elements[i].disabled = true;
   }
-
-  return array;
 };
 
-var generatePins = function () {
-  var pins = [];
-  for (var i = 0; i < PIN_AMOUNT; i++) {
-    var featuresArr = shuffle(FEATURES);
-    var featuresAmount = randomInt(1, FEATURES.length);
-    for (var j = FEATURES.length - featuresAmount; j > 0; j--) {
-      featuresArr.pop();
-    }
-    var photosArray = [];
-    var photosArrayLength = randomInt(1, 10);
-    for (var k = 0; k < photosArrayLength; k++) {
-      photosArray[k] = 'http://o0.github.io/assets/images/tokyo/hotel' + k + 1 + '.jpg';
-    }
-    var locationX = randomInt(0, BLOCK_SIZE);
-    var locationY = randomInt(MIN_Y, MAX_Y);
-    var pin = {
-      author: {
-        avatar: 'img/avatars/user0' + (i + 1) + '.png'
-      },
-      offer: {
-        title: 'Заголовок',
-        address: locationX + ',' + ' ' + locationY,
-        price: randomInt(6, 100) * 100,
-        type: ROOM_TYPE[randomInt(0, ROOM_TYPE.length - 1)],
-        rooms: randomInt(1, 6),
-        guests: randomInt(1, 15),
-        checkin: '1' + randomInt(2, 4) + ':00',
-        checkout: '1' + randomInt(2, 4) + ':00',
-        features: featuresArr,
-        description: 'Описание',
-        photos: photosArray
-      },
-      location: {
-        x: locationX,
-        y: locationY
-      }
-    };
-    pins[i] = pin;
+var enableElements = function (elements) {
+  for (var i = 0; i < elements.length; i++) {
+    elements[i].disabled = false;
   }
-  return pins;
 };
 
-map.classList.remove('map-faded');
+var disabler = function () {
+  disableElements(inputs);
+  disableElements(selects);
+  disableElements(filterInputs);
+  disableElements(filterSelects);
+};
 
-var renderPins = function () {
-  var pins = generatePins();
-  var fragment = document.createDocumentFragment();
-  for (var i = 0; i < pins.length; i++) {
-    var pinElement = pinTemplate.cloneNode(true);
-    var pinPicture = pinElement.querySelector('img');
-    pinElement.style.left = (pins[i].location.x - pinPicture.width / 2) + 'px';
-    pinElement.style.top = (pins[i].location.y - pinPicture.height) + 'px';
-    pinPicture.src = pins[i].author.avatar;
-    pinPicture.alt = pins[i].offer.title;
-    fragment.appendChild(pinElement);
+var enabler = function () {
+  enableElements(inputs);
+  enableElements(selects);
+  enableElements(filterInputs);
+  enableElements(filterSelects);
+};
+
+disabler();
+
+var setAddress = function () {
+  var addressY = parseInt(mainPin.style.top, 10) + PIN_POINT_HEIGHT;
+  var addressX = parseInt(mainPin.style.left, 10) + PIN_POINT_WIDTH / 2;
+  address.value = addressX + ' ' + addressY;
+};
+
+setAddress();
+
+mainPin.addEventListener('mousedown', function (evt) {
+  if (evt.button === 0) {
+    map.classList.remove('map--faded');
+    enabler();
+    setAddress();
   }
-  return fragment;
-};
+});
 
-pinsList.appendChild(renderPins());
+mainPin.addEventListener('keydown', function (evt) {
+  if (evt.key === 'Enter') {
+    evt.preventDefault();
+    map.classList.remove('map--faded');
+    enabler();
+    setAddress();
+  }
+});
+
+roomNumber.addEventListener('change', function () {
+  if (roomNumber.children[0].selected) {
+    capacity.children[0].disabled = true;
+    capacity.children[1].disabled = true;
+    capacity.children[3].disabled = true;
+    capacity.children[2].disabled = false;
+    capacity.children[2].selected = true;
+  } else if (roomNumber.children[1].selected) {
+    capacity.children[0].disabled = true;
+    capacity.children[3].disabled = true;
+    capacity.children[1].disabled = false;
+    capacity.children[2].disabled = false;
+    capacity.children[1].selected = true;
+  } else if (roomNumber.children[2].selected) {
+    capacity.children[3].disabled = true;
+    capacity.children[0].disabled = false;
+    capacity.children[1].disabled = false;
+    capacity.children[2].disabled = false;
+    capacity.children[0].selected = true;
+  } else {
+    capacity.children[0].disabled = true;
+    capacity.children[1].disabled = true;
+    capacity.children[2].disabled = true;
+    capacity.children[3].disabled = false;
+    capacity.children[3].selected = true;
+  }
+});
