@@ -15,33 +15,33 @@ var address = document.getElementById('address');
 var roomNumber = document.getElementById('room_number');
 var capacity = document.getElementById('capacity');
 
-var getElementsDisabled = function (elements) {
+var disableElements = function (elements) {
   for (var i = 0; i < elements.length; i++) {
     elements[i].disabled = true;
   }
 };
 
-var getElementsEnabled = function (elements) {
+var enableElements = function (elements) {
   for (var i = 0; i < elements.length; i++) {
     elements[i].disabled = false;
   }
 };
 
-var getDisabled = function () {
-  getElementsDisabled(inputs);
-  getElementsDisabled(selects);
-  getElementsDisabled(filterInputs);
-  getElementsDisabled(filterSelects);
+var disabler = function () {
+  disableElements(inputs);
+  disableElements(selects);
+  disableElements(filterInputs);
+  disableElements(filterSelects);
 };
 
-var getEnabled = function () {
-  getElementsEnabled(inputs);
-  getElementsEnabled(selects);
-  getElementsEnabled(filterInputs);
-  getElementsEnabled(filterSelects);
+var enabler = function () {
+  enableElements(inputs);
+  enableElements(selects);
+  enableElements(filterInputs);
+  enableElements(filterSelects);
 };
 
-getDisabled();
+disabler();
 
 var setAddress = function () {
   var addressY = parseInt(mainPin.style.top, 10) + PIN_POINT_HEIGHT;
@@ -54,7 +54,7 @@ setAddress();
 mainPin.addEventListener('mousedown', function (evt) {
   if (evt.button === 0) {
     map.classList.remove('map--faded');
-    getEnabled();
+    enabler();
     setAddress();
   }
 });
@@ -63,7 +63,7 @@ mainPin.addEventListener('keydown', function (evt) {
   if (evt.key === 'Enter') {
     evt.preventDefault();
     map.classList.remove('map--faded');
-    getEnabled();
+    enabler();
     setAddress();
   }
 });
